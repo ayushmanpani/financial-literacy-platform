@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  role        Role     @default(USER)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  profile     Profile?
+  expenses    Expense[]
+  goals       FinancialGoal[]
+  schemes     UserSchemeEligibility[]
+}
+
+model Profile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  income       Float
+  occupation   String
+  familySize   Int
+  location     String
+  savingsGoal  Float?
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Expense {
+  id        String   @id @default(uuid())
+  userId    String
+  category  String
+  amount    Float
+  month     String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model FinancialGoal {
+  id          String   @id @default(uuid())
+  userId      String
+  targetAmount Float
+  deadline     DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model GovernmentScheme {
+  id              String   @id @default(uuid())
+  name            String
+  description     String
+  eligibilityRules Json
+  createdAt       DateTime @default(now())
+
+  users           UserSchemeEligibility[]
+}
+
+model UserSchemeEligibility {
+  id         String   @id @default(uuid())
+  userId     String
+  schemeId   String
+  status     EligibilityStatus @default(PENDING)
+
+  user       User @relation(fields: [userId], references: [id])
+  scheme     GovernmentScheme @relation(fields: [schemeId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum EligibilityStatus {
+  PENDING
+  ELIGIBLE
+  NOT_ELIGIBLE
+}

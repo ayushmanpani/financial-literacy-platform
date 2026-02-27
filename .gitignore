@@ -1,0 +1,22 @@
+# Node
+node_modules
+.next
+dist
+
+# Environment
+.env
+.env.local
+
+# Prisma
+prisma/dev.db
+
+# Python
+__pycache__
+*.pyc
+
+# Docker
+postgres_data
+
+# OS
+.DS_Store
+Thumbs.db
