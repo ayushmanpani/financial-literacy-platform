@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@repo/db";
 import { requireRole } from "@/lib/requireRole";
+import { withErrorHandling } from "@/lib/errorHandler";
 
-export async function POST(req: Request) {
-  const { user, error } = await requireRole(["CLIENT"]);
+export const POST = withErrorHandling(async (req: Request) => {
+  const { user, error } = await requireRole(["USER"]);
   if (error) return error;
 
   const body = await req.json();
@@ -18,9 +19,9 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json(goal);
-}
+});
 
-export async function GET() {
+export const GET = withErrorHandling(async () => {
   const { user, error } = await requireRole(["CLIENT"]);
   if (error) return error;
 
@@ -34,4 +35,4 @@ export async function GET() {
   });
 
   return NextResponse.json(goals);
-}
+});

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@repo/db";
 import { requireRole } from "@/lib/requireRole";
+import { withErrorHandling } from "@/lib/errorHandler";
 
 interface Params {
   params: {
@@ -8,8 +9,8 @@ interface Params {
   };
 }
 
-export async function PUT(req: Request, { params }: Params) {
-  const { user, error } = await requireRole(["CLIENT"]);
+export const PUT = withErrorHandling(async (req: Request, { params }: Params) => {
+  const { user, error } = await requireRole(["USER"]);
   if (error) return error;
 
   const body = await req.json();
@@ -31,10 +32,10 @@ export async function PUT(req: Request, { params }: Params) {
   });
 
   return NextResponse.json(updated);
-}
+});
 
-export async function DELETE(_: Request, { params }: Params) {
-  const { user, error } = await requireRole(["CLIENT"]);
+export const DELETE = withErrorHandling(async (req: Request, { params }: Params) => {
+  const { user, error } = await requireRole(["USER"]);
   if (error) return error;
 
   const existing = await prisma.financialGoal.findUnique({
@@ -50,4 +51,4 @@ export async function DELETE(_: Request, { params }: Params) {
   });
 
   return NextResponse.json({ message: "Deleted" });
-}
+});

@@ -11,6 +11,8 @@ export async function requireRole(allowedRoles: string[]) {
     };
   }
 
+  console.log("User role:", (user as any).role);
+  console.log("Allowed roles:", allowedRoles);
   if (!allowedRoles.includes((user as any).role)) {
     return {
       error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),

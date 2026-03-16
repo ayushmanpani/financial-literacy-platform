@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@repo/db";
 import { requireRole } from "@/lib/requireRole";;
 import { evaluateEligibility } from "@/lib/evaluateEligibility";
+import { withErrorHandling } from "@/lib/errorHandler";
 
-export async function GET() {
-  const { user, error } = await requireRole(["CLIENT"]);
+export const GET = withErrorHandling(async () => {
+  const { user, error } = await requireRole(["USER"]);
   if (error) return error;
 
   const profile = await prisma.profile.findUnique({
@@ -25,4 +26,4 @@ export async function GET() {
   );
 
   return NextResponse.json(eligible);
-}
+});

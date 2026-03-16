@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/getUser";
+import { withErrorHandling } from "@/lib/errorHandler";
 
-export async function GET() {
+export const GET = withErrorHandling(async () => {
   const user = await getUserFromCookie();
 
   if (!user) {
@@ -9,4 +10,4 @@ export async function GET() {
   }
 
   return NextResponse.json(user);
-}
+});

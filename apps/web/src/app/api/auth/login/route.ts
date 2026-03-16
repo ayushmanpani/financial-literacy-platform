@@ -2,8 +2,9 @@ import { prisma } from "@repo/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { signToken } from "@/lib/auth";
+import { withErrorHandling } from "@/lib/errorHandler";
 
-export async function POST(req: Request) {
+export const POST = withErrorHandling(async (req: Request) => {
   const { email, password } = await req.json();
 
   const user = await prisma.user.findUnique({ where: { email } });
@@ -27,4 +28,4 @@ export async function POST(req: Request) {
   });
 
   return response;
-}
+});

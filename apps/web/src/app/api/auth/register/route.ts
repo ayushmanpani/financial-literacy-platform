@@ -2,8 +2,9 @@ import { prisma } from "@repo/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { signToken } from "@/lib/auth";
+import { withErrorHandling } from "@/lib/errorHandler";
 
-export async function POST(req: Request) {
+export const POST = withErrorHandling(async (req: Request) => {
   const { email, password } = await req.json();
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
   const hashed = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
-    data: { email, password: hashed },
+    data: { email, password: hashed, role:"USER", },
   });
 
   const token = signToken({ userId: user.id, role: user.role });
@@ -28,4 +29,4 @@ export async function POST(req: Request) {
   });
 
   return response;
-}
+});

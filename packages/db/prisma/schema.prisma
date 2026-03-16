@@ -19,6 +19,8 @@ model User {
   expenses    Expense[]
   goals       FinancialGoal[]
   schemes     UserSchemeEligibility[]
+  budgetAnalyses BudgetAnalysis[]
+
 }
 
 model Profile {
@@ -73,6 +75,17 @@ model UserSchemeEligibility {
 
   user       User @relation(fields: [userId], references: [id])
   scheme     GovernmentScheme @relation(fields: [schemeId], references: [id])
+}
+
+model BudgetAnalysis {
+  id           String   @id @default(uuid())
+  userId       String
+  totalExpense Float
+  savings      Float
+  suggestion   String
+  createdAt    DateTime @default(now())
+
+  user         User @relation(fields: [userId], references: [id])
 }
 
 enum Role {

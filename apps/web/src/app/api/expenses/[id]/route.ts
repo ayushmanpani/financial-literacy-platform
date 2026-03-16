@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@repo/db";
 import { requireRole } from "@/lib/requireRole";
+import { withErrorHandling } from "@/lib/errorHandler";
+import { updateExpense, deleteExpense } from "@/services/expense.service";
+
 
 interface Params {
   params: {
@@ -8,8 +11,8 @@ interface Params {
   };
 }
 
-export async function PUT(req: Request, { params }: Params) {
-  const { user, error } = await requireRole(["CLIENT"]);
+export const PUT = withErrorHandling(async (req: Request, { params }: Params) => {
+  const { user, error } = await requireRole(["USER"]);
   if (error) return error;
 
   const body = await req.json();
@@ -22,16 +25,13 @@ export async function PUT(req: Request, { params }: Params) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const updated = await prisma.expense.update({
-    where: { id: params.id },
-    data: body,
-  });
+  const updated = await updateExpense(params.id, body);
 
   return NextResponse.json(updated);
-}
+});
 
-export async function DELETE(_: Request, { params }: Params) {
-  const { user, error } = await requireRole(["CLIENT"]);
+export const DELETE = withErrorHandling(async (req: Request, { params }: Params) => {
+  const { user, error } = await requireRole(["USER"]);
   if (error) return error;
 
   const existing = await prisma.expense.findUnique({
@@ -42,9 +42,7 @@ export async function DELETE(_: Request, { params }: Params) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  await prisma.expense.delete({
-    where: { id: params.id },
-  });
+  await deleteExpense(params.id);
 
   return NextResponse.json({ message: "Deleted" });
-}
+});
